@@ -52,29 +52,26 @@ public class ProductService {
 
 	}
 
-	public Product getProductById(Long id) throws CustomException {
+	public Product getProductById(Object id) throws CustomException {
 		Product productDetails = productRepository.getProductDetails(id);
-
 		return productDetails;
-
 	}
 
 	public void updateProduct(Product updatedProduct, Long id) {
-
 		productRepository.updateProduct(updatedProduct.getProductname(), updatedProduct.getPrice(),
 				updatedProduct.getQuantity(), updatedProduct.getCategory(), updatedProduct.getSearchkeyword(), id);
-
 	}
 
 	public void deleteProduct(Product existingProduct) {
 		productRepository.delete(existingProduct);
-
 	}
 
 	public Product getProductbyId(Long id) throws CustomException {
-
 		return productRepository.findById(id).orElseThrow(() -> new CustomException("Product not found"));
-
 	}
+
+//	public List<Product> getProductByIds(List<Long> productIds) {	
+//				return null;
+//	}
 
 }

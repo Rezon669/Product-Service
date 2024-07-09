@@ -22,11 +22,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	public List<Product> searchProduct(String searchkeyword);
 
 	@Query("SELECT p FROM Product p WHERE p.productid=:id")
-	public Product getProductDetails(Long id);
+	public Product getProductDetails(Object id);
 
 	@Modifying
 	@Transactional
 	@Query("UPDATE Product p SET p.productname = :productname, p.quantity = :quantity, p.price = :price, p.category = :category, p.searchkeyword = :searchkeyword WHERE p.id = :id")
-	public void updateProduct(String productname, int price, int quantity, String category, String searchkeyword, Long id);
+	public void updateProduct(String productname, int price, int quantity, String category, String searchkeyword,
+			Long id);
 
 }

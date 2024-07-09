@@ -1,14 +1,12 @@
 package com.ecom.productservice.exception;
 
-
-
 public class CustomException extends Exception {
 
 	public CustomException(String string, Exception e) {
-        super();
-    }
+		super();
+	}
 
-    public CustomException(String message) {
-        super(message);
-    }
+	public CustomException(String message) {
+		super(message);
+	}
 }

@@ -3,6 +3,7 @@ package com.ecom.productservice.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,8 +25,10 @@ import com.ecom.productservice.exception.CustomException;
 import com.ecom.productservice.model.Product;
 import com.ecom.productservice.service.ProductService;
 
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/easybuy/product")
+@RequestMapping("/ecom/product")
 public class ProductController {
 
 	private static final Logger logger = LogManager.getLogger(ProductController.class);
@@ -33,21 +36,10 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 
-	@GetMapping("/admin/addproducts")
-	public String addProduct() {
-
-		return "product";
-	}
-
-	@GetMapping("/public/homepage")
-	public String home() {
-
-		return "welcome";
-	}
-
 	@PostMapping("/admin/addproduct")
 	// @PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<String> addProduct(Product product, Model model) {
+	public ResponseEntity<String> addProduct(@Valid @RequestBody Product product, Model model) {
+		System.out.println(product);
 		try {
 			productService.addProducts(product);
 			logger.info("Product details are added");
@@ -57,13 +49,8 @@ public class ProductController {
 
 			model.addAttribute("errorMessage", e.getMessage());
 			logger.error(e);
-
-			// return "product";
-
 			return ResponseEntity.badRequest().body(e + " ");
-
 		}
-
 	}
 
 	@GetMapping("/public/getproducts")
@@ -78,23 +65,13 @@ public class ProductController {
 			logger.error(e);
 
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
 		}
-
-	}
-
-	@GetMapping("/public/searchproduct")
-	public String searchProduct() {
-
-		return "searchproduct";
-
 	}
 
 	@GetMapping("/public/searchproducts")
 	public ResponseEntity<List<Product>> searchProducts(@RequestParam("searchkeyword") String searchkeyword)
 			throws CustomException {
 		try {
-			System.out.println(searchkeyword);
 			List<Product> products = productService.searchProduct(searchkeyword);
 
 			if (products.isEmpty()) {
@@ -103,9 +80,8 @@ public class ProductController {
 				return new ResponseEntity<>(products, HttpStatus.OK);
 			}
 		} catch (CustomException e) {
-
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // You can return a custom error
-																						// response if needed
+																						// // response if needed
 		}
 
 	}
@@ -158,23 +134,50 @@ public class ProductController {
 			// return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		}
-
 	}
-	
+
 	@GetMapping("/public/{id}")
 	public boolean findById(Long productId) {
 		Product existingProduct = null;
 		try {
 			existingProduct = productService.getProductById(productId);
 		} catch (CustomException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
-		if(existingProduct==null) {
+		if (existingProduct == null) {
 			return false;
-		}
-		else {
+		} else {
 			return true;
 		}
 	}
+	
+	@GetMapping("/{id}")
+	public Product findByGivenid(Long productId) {
+		Product existingProduct = null;
+		try {
+			existingProduct = productService.getProductById(productId);
+		} catch (CustomException e) {
+
+			e.printStackTrace();
+		}
+		if (existingProduct == null) {
+			return null;
+		} else {
+			return existingProduct;
+		}
+	}
+
+	@GetMapping("/public/productlist")
+	public List<Product> findAllByIds(@RequestParam("ids") List<Long> productIds) {
+		return productIds.stream().map(id -> {
+			try {
+				return productService.getProductById(id);
+			} catch (CustomException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}).collect(Collectors.toList());
+	}
+
 }
